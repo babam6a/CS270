@@ -290,8 +290,8 @@ public class search_algorithm {
         			
 					if (way != direction) {
 						turn_robot(direction, way);
-					// s ###################################
 						direction = way;
+					// s ###################################
 						turn_count++;
 					// e ###################################
 					}
@@ -328,8 +328,8 @@ public class search_algorithm {
 
         		    } else {
 						move_forward();
-					// s ###################################
 						current_pos = new_pos;
+					// s ###################################
 						move_count++;
 						System.out.println("move_to: " + Arrays.toString(current_pos) + "\n");
 					// e ###################################
