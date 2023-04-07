@@ -3,23 +3,98 @@ import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.Collections;
+import lejos.hardware.motor.Motor;
+import lejos.robotics.RegulatedMotor;
 
 public class search_algorithm {
 	// #########################################################
 	// should implement robot-related function from here...
 
 	public static void move_forward() {
-		// code will be inserted here
+		RegulatedMotor leftMotor = Motor. A;
+		RegulatedMotor rightMotor = Motor. B;
+		
+		leftMotor.setSpeed(400);
+		rightMotor.setSpeed(371);
+		leftMotor.setAcceleration(800);
+		rightMotor.setAcceleration(742);
+		
+		leftMotor.forward();
+		rightMotor.forward();
+
+		try {
+			Thread.sleep(1600);
+		}catch(InterruptedException e) {}
+		leftMotor.stop();
+		rightMotor.stop();
+		
+		rightMotor.backward();
+		try {
+			Thread.sleep(620);
+		}catch(InterruptedException e) {}
+		rightMotor.stop();
 		return;
 	}
+	
+	public static void motorMoveBackward() {
+		RegulatedMotor leftMotor = Motor. A;
+		RegulatedMotor rightMotor = Motor. B;
+		
+		leftMotor.setSpeed(400);
+		rightMotor.setSpeed(371);
+		leftMotor.setAcceleration(800);
+		rightMotor.setAcceleration(742);
+		
+		leftMotor.backward();
+		rightMotor.backward();
+
+		try {
+			Thread.sleep(1000);
+		}catch(InterruptedException e) {}
+		leftMotor.stop();
+		rightMotor.stop();
+		
+		rightMotor.forward();
+		try {
+			Thread.sleep(620);
+		}catch(InterruptedException e) {}
+		rightMotor.stop();
+		return;
+	}
+	
 	public static void left_turn() {
-		// code will be inserted here
-        return;
-    }
-    public static void right_turn() {
-		// code will be inserted here
-        return;
-    }
+		motorMoveBackward();
+		RegulatedMotor rightMotor = Motor. B;
+		
+		rightMotor.setSpeed(400);
+		rightMotor.setAcceleration(800);
+		
+		rightMotor.forward();
+		
+		try {
+			Thread.sleep(1690);
+		}catch(InterruptedException e) {}
+		
+		rightMotor.stop();
+        	return;
+	}
+	
+	public static void right_turn() {
+		motorMoveBackward();
+		RegulatedMotor leftMotor = Motor. A;
+		
+		leftMotor.setSpeed(400);
+		leftMotor.setAcceleration(800);
+		
+		leftMotor.forward();
+		
+		try {
+			Thread.sleep(1690);
+		}catch(InterruptedException e) {}
+		
+		leftMotor.stop();
+		return;
+	    }
 
 	public static boolean is_box(int[][] map, int[] position) {
 		if (map[position[0]][position[1]] == 2) {
