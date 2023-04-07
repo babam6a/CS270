@@ -5,10 +5,22 @@ import java.util.Scanner;
 import java.util.Collections;
 import java.util.Queue;
 import java.util.LinkedList;
+import lejos.hardware.ev3.EV3;
+import lejos.hardware.lcd.TextLCD;
+import lejos.hardware.motor.Motor;
+import lejos.hardware.port.SensorPort;
+import lejos.hardware.sensor.EV3ColorSensor;
+import lejos.hardware.sensor.EV3IRSensor;
+import lejos.hardware.BrickFinder;
+import lejos.robotics.Color;
+import lejos.robotics.RegulatedMotor;
+import lejos.robotics.SampleProvider;
+import lejos.utility.Delay;
 
 public class search_algorithm {
+	public static boolean testing = false; // a variable for testing robot-related function
 	// #########################################################
-	// should implement robot-related function from here...
+	// robot related functions are here
 	// move_forward() : move forward
 	// left_turn() : turn left
 	// right_turn() : turn right
@@ -17,6 +29,13 @@ public class search_algorithm {
 	// select_start_point() : true if start point is {0,0}, else false
 
 	public static void move_forward() {
+		if(testing) {
+			EV3 ev3 = (EV3) BrickFinder.getLocal();
+			TextLCD lcd = ev3.getTextLCD();
+			lcd.clear();
+			lcd.drawString("move_forward", 1, 4);
+		}
+		
 		RegulatedMotor leftMotor = Motor. A;
 		RegulatedMotor rightMotor = Motor. B;
 		leftMotor.synchronizeWith(new RegulatedMotor[] {rightMotor});
@@ -33,6 +52,13 @@ public class search_algorithm {
 		return;
 	}
 	public static void left_turn() {
+		if(testing) {
+			EV3 ev3 = (EV3) BrickFinder.getLocal();
+			TextLCD lcd = ev3.getTextLCD();
+			lcd.clear();
+			lcd.drawString("left_turn", 1, 4);
+		}
+		
 		RegulatedMotor leftMotor = Motor. A;
 		RegulatedMotor rightMotor = Motor. B;
 		
@@ -46,6 +72,13 @@ public class search_algorithm {
         return;
     }
     public static void right_turn() {
+		if(testing) {
+			EV3 ev3 = (EV3) BrickFinder.getLocal();
+			TextLCD lcd = ev3.getTextLCD();
+			lcd.clear();
+			lcd.drawString("right_turn", 1, 4);
+		}
+		
 		RegulatedMotor leftMotor = Motor. A;
 		RegulatedMotor rightMotor = Motor. B;
 		
@@ -60,6 +93,27 @@ public class search_algorithm {
     }
 
 	public static boolean is_box(int[][] real_map, int[] position) {
+		final EV3IRSensor sensor = new EV3IRSensor(SensorPort. S1);
+
+		Delay.msDelay(1000); // process loads after a second delay
+		
+		SampleProvider distanceMode = sensor.getDistanceMode();
+		float value[] = new float[distanceMode.sampleSize()];
+		
+		distanceMode.fetchSample(value, 0);
+		float centimeter = value[0];
+		
+		if(testing) {
+			EV3 ev3 = (EV3) BrickFinder.getLocal();
+			TextLCD lcd = ev3.getTextLCD();
+			lcd.clear();
+			lcd.drawString("Distance : " + centimeter, 1, 4);
+			
+			Delay.msDelay(1000); // a second to show the centimeter
+		}
+		
+		if(centimeter < 23) real_map[position[0]][position[1]] = 2; // must be changed to account for sensor problem
+		
 		if (real_map[position[0]][position[1]] == 2) {
 			return true;
 		} else {
@@ -68,6 +122,20 @@ public class search_algorithm {
 	}
 
 	public static boolean is_red(int[][] real_map, int[] position) {
+		final EV3ColorSensor color_sensor = new EV3ColorSensor(SensorPort. S2);
+		int color_id = color_sensor.getColorID();
+		
+		if(testing) {
+			EV3 ev3 = (EV3) BrickFinder.getLocal();
+			TextLCD lcd = ev3.getTextLCD();
+			lcd.clear();
+			lcd.drawString("Red? " + (color_id == Color.RED), 1, 4);
+			
+			Delay.msDelay(1000); // a second to show the centimeter
+		}
+		
+		if(color_id == Color.RED) real_map[position[0]][position[1]] = 1;
+		
 		if (real_map[position[0]][position[1]] == 1) {
 			return true;
 		} else {
