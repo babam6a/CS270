@@ -108,10 +108,12 @@ public class cs270project {
 		
 		/* test for function IRSensor() */
 		if(testNum == 2){
-			if(result >= 23) str = "no box ahead";
-			else str = "box ahead";
-			lcd.drawString(str, 1, 4);
 			str = "distance : " + result;
+			lcd.drawString(str, 1, 4);
+		}
+		
+		if(testNum == 3) {
+			str = "turn" + result;
 			lcd.drawString(str, 2, 4);
 		}
 	}
@@ -129,98 +131,57 @@ public class cs270project {
 		float centimeter = value[0];
 		
 		if(testing) test(2, centimeter); // test number for IRSensor is 2
-		Delay.msDelay(30000);
+		Delay.msDelay(3000);
 		return centimeter < 1;
 	}
 
 	public static void motorMoveForward() {
 		RegulatedMotor leftMotor = Motor. A;
 		RegulatedMotor rightMotor = Motor. B;
-		
+		leftMotor.synchronizeWith(new RegulatedMotor[] {rightMotor});
+		leftMotor.startSynchronization();
 		leftMotor.setSpeed(400);
-		rightMotor.setSpeed(371);
+		rightMotor.setSpeed(400);
 		leftMotor.setAcceleration(800);
-		rightMotor.setAcceleration(742);
-		
-		leftMotor.forward();
-		rightMotor.forward();
+		rightMotor.setAcceleration(800);
+		leftMotor.rotate(627);
+		rightMotor.rotate(627);
+		leftMotor.endSynchronization();
 
-		try {
-			Thread.sleep(1600);
-		}catch(InterruptedException e) {}
-		leftMotor.stop();
-		rightMotor.stop();
-		
-		rightMotor.backward();
-		try {
-			Thread.sleep(620);
-		}catch(InterruptedException e) {}
-		rightMotor.stop();
-	}
-
-	public static void motorMoveBackward() {
-		RegulatedMotor leftMotor = Motor. A;
-		RegulatedMotor rightMotor = Motor. B;
-		
-		leftMotor.setSpeed(400);
-		rightMotor.setSpeed(371);
-		leftMotor.setAcceleration(800);
-		rightMotor.setAcceleration(742);
-		
-		leftMotor.backward();
-		rightMotor.backward();
-
-		try {
-			Thread.sleep(1000);
-		}catch(InterruptedException e) {}
-		leftMotor.stop();
-		rightMotor.stop();
-		
-		rightMotor.forward();
-		try {
-			Thread.sleep(620);
-		}catch(InterruptedException e) {}
-		rightMotor.stop();
+		Delay.msDelay(3000);
 	}
 	
 	public static void motorRotateLeft() {
-		motorMoveBackward();
+		RegulatedMotor leftMotor = Motor. A;
 		RegulatedMotor rightMotor = Motor. B;
 		
+		leftMotor.setSpeed(400);
 		rightMotor.setSpeed(400);
+		leftMotor.setAcceleration(800);
 		rightMotor.setAcceleration(800);
-		
-		rightMotor.forward();
-		
-		try {
-			Thread.sleep(1690);
-		}catch(InterruptedException e) {}
-		
-		rightMotor.stop();
+		leftMotor.rotate(-350);
+		rightMotor.rotate(350);
+		leftMotor.rotate(180);
 	}
 
 	public static void motorRotateRight() {
-		motorMoveBackward();
 		RegulatedMotor leftMotor = Motor. A;
+		RegulatedMotor rightMotor = Motor. B;
 		
 		leftMotor.setSpeed(400);
+		rightMotor.setSpeed(400);
 		leftMotor.setAcceleration(800);
-		
-		leftMotor.forward();
-		
-		try {
-			Thread.sleep(1690);
-		}catch(InterruptedException e) {}
-		
-		leftMotor.stop();
+		rightMotor.setAcceleration(800);
+		rightMotor.rotate(-350);
+		leftMotor.rotate(350);
+		rightMotor.rotate(175);
 	}
 	
 	public static void main(String[] args) {
 		cs270project project = new cs270project();
 		motorMoveForward();
-		motorRotateRight();
-		motorRotateLeft();
-		project.color();
+		Delay.msDelay(5000);
 		project.IRSensor();
+		Delay.msDelay(10000);
 	}
 }
