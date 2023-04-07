@@ -93,7 +93,7 @@ public class search_algorithm {
     }
 
 	public static boolean is_box(int[][] real_map, int[] position) {
-		final EV3IRSensor sensor = new EV3IRSensor(SensorPort. S1);
+		EV3IRSensor sensor = new EV3IRSensor(SensorPort. S1);
 
 		Delay.msDelay(1000); // process loads after a second delay
 		
@@ -122,7 +122,7 @@ public class search_algorithm {
 	}
 
 	public static boolean is_red(int[][] real_map, int[] position) {
-		final EV3ColorSensor color_sensor = new EV3ColorSensor(SensorPort. S2);
+		EV3ColorSensor color_sensor = new EV3ColorSensor(SensorPort. S2);
 		int color_id = color_sensor.getColorID();
 		
 		if(testing) {
