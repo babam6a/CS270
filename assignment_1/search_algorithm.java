@@ -17,15 +17,45 @@ public class search_algorithm {
 	// select_start_point() : true if start point is {0,0}, else false
 
 	public static void move_forward() {
-		// code will be inserted here
+		RegulatedMotor leftMotor = Motor. A;
+		RegulatedMotor rightMotor = Motor. B;
+		leftMotor.synchronizeWith(new RegulatedMotor[] {rightMotor});
+		leftMotor.startSynchronization();
+		leftMotor.setSpeed(400);
+		rightMotor.setSpeed(400);
+		leftMotor.setAcceleration(800);
+		rightMotor.setAcceleration(800);
+		leftMotor.rotate(627);
+		rightMotor.rotate(627);
+		leftMotor.endSynchronization();
+
+		Delay.msDelay(3000);
 		return;
 	}
 	public static void left_turn() {
-		// code will be inserted here
+		RegulatedMotor leftMotor = Motor. A;
+		RegulatedMotor rightMotor = Motor. B;
+		
+		leftMotor.setSpeed(400);
+		rightMotor.setSpeed(400);
+		leftMotor.setAcceleration(800);
+		rightMotor.setAcceleration(800);
+		leftMotor.rotate(-350);
+		rightMotor.rotate(350);
+		leftMotor.rotate(180);
         return;
     }
     public static void right_turn() {
-		// code will be inserted here
+		RegulatedMotor leftMotor = Motor. A;
+		RegulatedMotor rightMotor = Motor. B;
+		
+		leftMotor.setSpeed(400);
+		rightMotor.setSpeed(400);
+		leftMotor.setAcceleration(800);
+		rightMotor.setAcceleration(800);
+		rightMotor.rotate(-350);
+		leftMotor.rotate(350);
+		rightMotor.rotate(175);
         return;
     }
 
