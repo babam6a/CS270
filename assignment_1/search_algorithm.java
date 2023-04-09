@@ -12,6 +12,7 @@ import lejos.hardware.port.SensorPort;
 import lejos.hardware.sensor.EV3ColorSensor;
 import lejos.hardware.sensor.EV3IRSensor;
 import lejos.hardware.BrickFinder;
+import lejos.hardware.Keys;
 import lejos.robotics.Color;
 import lejos.robotics.RegulatedMotor;
 import lejos.robotics.SampleProvider;
@@ -92,7 +93,7 @@ public class search_algorithm {
         return;
     }
 
-	public static boolean is_box(int[][] real_map, int[] position) {
+	public static boolean is_box() {
 		EV3IRSensor sensor = new EV3IRSensor(SensorPort. S1);
 
 		Delay.msDelay(1000); // process loads after a second delay
@@ -112,16 +113,18 @@ public class search_algorithm {
 			Delay.msDelay(1000); // a second to show the centimeter
 		}
 		
-		if(centimeter < 23) real_map[position[0]][position[1]] = 2; // must be changed to account for sensor problem
-		
-		if (real_map[position[0]][position[1]] == 2) {
+		if(centimeter < 23) {
 			return true;
-		} else {
-			return false;
-		}
+		} else return false; // must be changed to account for sensor problem
+		
+		// if (real_map[position[0]][position[1]] == 2) {
+		// 	return true;
+		// } else {
+		// 	return false;
+		// }
 	}
 
-	public static boolean is_red(int[][] real_map, int[] position) {
+	public static boolean is_red() {
 		EV3ColorSensor color_sensor = new EV3ColorSensor(SensorPort. S2);
 		int color_id = color_sensor.getColorID();
 		
@@ -134,28 +137,29 @@ public class search_algorithm {
 			Delay.msDelay(1000); // a second to show the centimeter
 		}
 		
-		if(color_id == Color.RED) real_map[position[0]][position[1]] = 1;
+		if(color_id == Color.RED) {
+			return true;
+		} else return false;
 		
-		if (real_map[position[0]][position[1]] == 1) {
+		// if (real_map[position[0]][position[1]] == 1) {
+		// 	return true;
+		// } else {
+		// 	return false;
+		// }
+	}
+
+	public static boolean select_start_point() {
+		EV3 ev3 = (EV3) BrickFinder.getLocal();
+		TextLCD lcd = ev3.getTextLCD();
+		Keys keys = ev3.getKeys();
+		lcd.clear();
+		lcd.drawString ("Select start point: {0,0} : <, {5,3} : >", 1, 4);
+
+		if (keys.waitForAnyPress() == Keys.ID_LEFT) {
 			return true;
 		} else {
 			return false;
 		}
-	}
-
-	public static boolean select_start_point() {
-		Scanner scan = new Scanner(System.in);
-		boolean result;
-
-		System.out.println("Select where to start. (0,0): 0, (5,3): 1");
-		int start_point = scan.nextInt();
-		if (start_point == 0) {
-			result = true;
-		} else {
-			result = false;
-		}
-		scan.close();
-		return result;
 	}
 	// to here.
 	// #########################################################
@@ -324,21 +328,21 @@ public class search_algorithm {
 		
 	// s #########################################################
 		// for debugging. not used in real test
-		int[][] real_map = new int[6][4];
-		int[][] red = {{1,1},{2,3}};
-		int[][] box = {{5,0},{5,1}};
-		int move_count = 0;
-		int turn_count = 0;
+// 		int[][] real_map = new int[6][4];
+// 		int[][] red = {{1,1},{2,3}};
+// 		int[][] box = {{5,0},{5,1}};
+// 		int move_count = 0;
+// 		int turn_count = 0;
 
-// 		nothing = 0, red = 1, box = 2
-		for (int i = 0; i < red.length; i++) {
-			int[] temp = red[i];
-			real_map[temp[0]][temp[1]] = 1;
-		}
-		for (int i = 0; i < box.length; i++) {
-			int[] temp = box[i];
-			real_map[temp[0]][temp[1]] = 2;
-		}
+// // 		nothing = 0, red = 1, box = 2
+// 		for (int i = 0; i < red.length; i++) {
+// 			int[] temp = red[i];
+// 			real_map[temp[0]][temp[1]] = 1;
+// 		}
+// 		for (int i = 0; i < box.length; i++) {
+// 			int[] temp = box[i];
+// 			real_map[temp[0]][temp[1]] = 2;
+// 		}
 	// e #########################################################
 		
 		// answer
@@ -372,15 +376,15 @@ public class search_algorithm {
         		}
         		
 				// s ###################################
-        		System.out.printf("current: %s, target: %s, path: %s\n",Arrays.toString(current_pos),Arrays.toString(target_pos), path.toString());
+        		// System.out.printf("current: %s, target: %s, path: %s\n",Arrays.toString(current_pos),Arrays.toString(target_pos), path.toString());
 				// e ###################################
         		
         		//move along with calculated path
         		for (int way: path) {
-        		    System.out.println("current_pos: " + Arrays.toString(current_pos) + "\n");
+        		    // System.out.println("current_pos: " + Arrays.toString(current_pos) + "\n");
         		    // first check this is visited block;
     			    if (!visited[current_pos[0]][current_pos[1]]) {
-    			        if (is_red(real_map, current_pos)) { // check_red_block
+    			        if (is_red()) { // check_red_block
     			            red_found.add(current_pos);
     			        }
     			        visited[current_pos[0]][current_pos[1]] = true;
@@ -390,14 +394,14 @@ public class search_algorithm {
 						turn_robot(direction, way);
 						direction = way;
 					// s ###################################
-						turn_count++;
+						// turn_count++;
 					// e ###################################
 					}
 
         			int[] d = drdc[way];
     			    int[] new_pos = {current_pos[0] + d[0], current_pos[1] + d[1]};
     			    
-    			    if (is_box(real_map, new_pos)) {
+    			    if (is_box()) {
     			        if (!visited[new_pos[0]][new_pos[1]]) {
                             box_found.add(new_pos);
                             map[new_pos[0]][new_pos[1]] = 2;
@@ -419,7 +423,7 @@ public class search_algorithm {
 					// s ###################################
 						// current_pos = new_pos;
 						// move_count++;
-    			        System.out.println("move_to: " + Arrays.toString(current_pos) + "\n");
+    			        // System.out.println("move_to: " + Arrays.toString(current_pos) + "\n");
 					// e ###################################
     			        // visited[new_pos[0]][new_pos[1]] = true;
     			        break; // recalculate path
@@ -428,8 +432,8 @@ public class search_algorithm {
 						move_forward();
 						current_pos = new_pos;
 					// s ###################################
-						move_count++;
-						System.out.println("move_to: " + Arrays.toString(current_pos) + "\n");
+						// move_count++;
+						// System.out.println("move_to: " + Arrays.toString(current_pos) + "\n");
 					// e ###################################
         		    }
         		}
@@ -442,14 +446,26 @@ public class search_algorithm {
 		
 		// s ###################################
 		// print function should be different
+		// for (int[] item: red_found) {
+		//     System.out.println("red_found: " + Arrays.toString(item) + "\n");
+		// }
+		// for (int[] item: box_found) {
+		//     System.out.println("box_found: " + Arrays.toString(item) + "\n");
+		// }
+		// System.out.printf("move_count: %d, turn_count: %d\n",move_count, turn_count);
+		// System.out.printf("current_pos: %s\n", Arrays.toString(current_pos));
+		// e ###################################
+
+		EV3 ev3 = (EV3) BrickFinder.getLocal();
+		TextLCD lcd = ev3.getTextLCD();
+		lcd.clear();
+
+		int line_count = 0;
 		for (int[] item: red_found) {
-		    System.out.println("red_found: " + Arrays.toString(item) + "\n");
+			lcd.drawString("(" + item[0] + "," + item[1] + "," + "R)", 0, line_count++);
 		}
 		for (int[] item: box_found) {
-		    System.out.println("box_found: " + Arrays.toString(item) + "\n");
+			lcd.drawString("(" + item[0] + "," + item[1] + "," + "B)", 0, line_count++);
 		}
-		System.out.printf("move_count: %d, turn_count: %d\n",move_count, turn_count);
-		System.out.printf("current_pos: %s\n", Arrays.toString(current_pos));
-		// e ###################################
     }
 }
