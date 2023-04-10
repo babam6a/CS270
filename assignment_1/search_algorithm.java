@@ -19,7 +19,7 @@ import lejos.robotics.SampleProvider;
 import lejos.utility.Delay;
 
 public class search_algorithm {
-	public static boolean testing = false; // a variable for testing robot-related function
+	public static boolean testing = true; // a variable for testing robot-related function
 	// #########################################################
 	// robot related functions are here
 	// move_forward() : move forward
@@ -381,6 +381,12 @@ public class search_algorithm {
         		
         		//move along with calculated path
         		for (int way: path) {
+        			if(testing) {
+        				EV3 ev3 = (EV3) BrickFinder.getLocal();
+        				TextLCD lcd = ev3.getTextLCD();
+        				lcd.clear();
+        				lcd.drawString("finding_path", 1, 4);
+        			}
         		    // System.out.println("current_pos: " + Arrays.toString(current_pos) + "\n");
         		    // first check this is visited block;
     			    if (!visited[current_pos[0]][current_pos[1]]) {
