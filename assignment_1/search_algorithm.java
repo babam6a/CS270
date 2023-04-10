@@ -20,6 +20,16 @@ import lejos.utility.Delay;
 
 public class search_algorithm {
 	public static boolean testing = true; // a variable for testing robot-related function
+	public static boolean noNeed = true;
+	
+	public static RegulatedMotor leftMotor = Motor. A;
+	public static RegulatedMotor rightMotor = Motor. B;
+	public static EV3IRSensor sensor = new EV3IRSensor(SensorPort. S1);
+	public static EV3ColorSensor color_sensor = new EV3ColorSensor(SensorPort. S2);
+	
+	public static EV3 ev3 = (EV3) BrickFinder.getLocal();
+	public static TextLCD lcd = ev3.getTextLCD();
+	public static Keys keys = ev3.getKeys();
 	// #########################################################
 	// robot related functions are here
 	// move_forward() : move forward
@@ -31,22 +41,18 @@ public class search_algorithm {
 
 	public static void move_forward() {
 		if(testing) {
-			EV3 ev3 = (EV3) BrickFinder.getLocal();
-			TextLCD lcd = ev3.getTextLCD();
 			lcd.clear();
 			lcd.drawString("move_forward", 1, 4);
 		}
 		
-		RegulatedMotor leftMotor = Motor. A;
-		RegulatedMotor rightMotor = Motor. B;
 		leftMotor.synchronizeWith(new RegulatedMotor[] {rightMotor});
 		leftMotor.startSynchronization();
 		leftMotor.setSpeed(400);
 		rightMotor.setSpeed(400);
-		leftMotor.setAcceleration(800);
-		rightMotor.setAcceleration(800);
-		leftMotor.rotate(627);
-		rightMotor.rotate(627);
+		leftMotor.setAcceleration(400);
+		rightMotor.setAcceleration(400);
+		leftMotor.rotate(657);
+		rightMotor.rotate(657);
 		leftMotor.endSynchronization();
 
 		Delay.msDelay(3000);
@@ -54,19 +60,14 @@ public class search_algorithm {
 	}
 	public static void left_turn() {
 		if(testing) {
-			EV3 ev3 = (EV3) BrickFinder.getLocal();
-			TextLCD lcd = ev3.getTextLCD();
 			lcd.clear();
 			lcd.drawString("left_turn", 1, 4);
 		}
 		
-		RegulatedMotor leftMotor = Motor. A;
-		RegulatedMotor rightMotor = Motor. B;
-		
 		leftMotor.setSpeed(400);
 		rightMotor.setSpeed(400);
-		leftMotor.setAcceleration(800);
-		rightMotor.setAcceleration(800);
+		leftMotor.setAcceleration(400);
+		rightMotor.setAcceleration(400);
 		leftMotor.rotate(-350);
 		rightMotor.rotate(350);
 		leftMotor.rotate(180);
@@ -74,19 +75,14 @@ public class search_algorithm {
     }
     public static void right_turn() {
 		if(testing) {
-			EV3 ev3 = (EV3) BrickFinder.getLocal();
-			TextLCD lcd = ev3.getTextLCD();
 			lcd.clear();
 			lcd.drawString("right_turn", 1, 4);
 		}
 		
-		RegulatedMotor leftMotor = Motor. A;
-		RegulatedMotor rightMotor = Motor. B;
-		
 		leftMotor.setSpeed(400);
 		rightMotor.setSpeed(400);
-		leftMotor.setAcceleration(800);
-		rightMotor.setAcceleration(800);
+		leftMotor.setAcceleration(400);
+		rightMotor.setAcceleration(400);
 		rightMotor.rotate(-350);
 		leftMotor.rotate(350);
 		rightMotor.rotate(175);
@@ -94,8 +90,6 @@ public class search_algorithm {
     }
 
 	public static boolean is_box() {
-		EV3IRSensor sensor = new EV3IRSensor(SensorPort. S1);
-
 		Delay.msDelay(1000); // process loads after a second delay
 		
 		SampleProvider distanceMode = sensor.getDistanceMode();
@@ -105,8 +99,6 @@ public class search_algorithm {
 		float centimeter = value[0];
 		
 		if(testing) {
-			EV3 ev3 = (EV3) BrickFinder.getLocal();
-			TextLCD lcd = ev3.getTextLCD();
 			lcd.clear();
 			lcd.drawString("Distance : " + centimeter, 1, 4);
 			
@@ -125,12 +117,9 @@ public class search_algorithm {
 	}
 
 	public static boolean is_red() {
-		EV3ColorSensor color_sensor = new EV3ColorSensor(SensorPort. S2);
 		int color_id = color_sensor.getColorID();
 		
-		if(testing) {
-			EV3 ev3 = (EV3) BrickFinder.getLocal();
-			TextLCD lcd = ev3.getTextLCD();
+		if(testing || noNeed) {
 			lcd.clear();
 			lcd.drawString("Red? " + (color_id == Color.RED), 1, 4);
 			
@@ -149,9 +138,6 @@ public class search_algorithm {
 	}
 
 	public static boolean select_start_point() {
-		EV3 ev3 = (EV3) BrickFinder.getLocal();
-		TextLCD lcd = ev3.getTextLCD();
-		Keys keys = ev3.getKeys();
 		lcd.clear();
 		lcd.drawString ("Select start point: {0,0} : <, {5,3} : >", 1, 4);
 
@@ -277,17 +263,24 @@ public class search_algorithm {
         return movement;
     }
     
-    public static int[] find_nearest_pos(int[] current_pos, boolean[][] visited) {
+    public static int[] find_nearest_pos(int[] current_pos, boolean[][] visited, int direction) {
         int radius = 0;
         int curr_x = current_pos[0];
         int curr_y = current_pos[1];
         
         int[] nearest_pos;
+        int[][] drdc = {{0,1}, {1,0}, {0,-1}, {-1,0}};
+        int[] d = drdc[direction];
+        int[] next_pos = new int[] {current_pos[0] + d[0], current_pos[1] + d[1]};
+        
+        if (is_right_position(next_pos) && !visited[next_pos[0]][next_pos[1]]) {
+        	return next_pos;
+        }
         
         while (true) {
             radius++;
-            for (int i = curr_x - radius; i <= curr_x + radius; i++) {
-				for (int j = curr_y - radius; j <= curr_y + radius; j++) {
+            for (int j = curr_y + radius; j >= curr_y - radius; j--) {
+				for (int i = curr_x + radius; i >= curr_x - radius; i--) {
 					// if (i == curr_x - radius || i == curr_x + radius || j == curr_y - radius || j == curr_y + radius) {
 					if ((Math.abs(i - curr_x) + Math.abs(j - curr_y)) == radius) {
 						if (is_right_position(new int[]{i, j}) && !visited[i][j]) {
@@ -355,8 +348,8 @@ public class search_algorithm {
 		boolean finished = false;
 		
 		// moving until visit all cells
-		while (true) {
-    		int[] target_pos = find_nearest_pos(current_pos, visited);
+		do {
+    		int[] target_pos = find_nearest_pos(current_pos, visited, direction);
     		
     		while (current_pos[0] != target_pos[0] || current_pos[1] != target_pos[1]) {
     		    // calculate path from current_position to target_position
@@ -382,14 +375,12 @@ public class search_algorithm {
         		//move along with calculated path
         		for (int way: path) {
         			if(testing) {
-        				EV3 ev3 = (EV3) BrickFinder.getLocal();
-        				TextLCD lcd = ev3.getTextLCD();
         				lcd.clear();
-        				lcd.drawString("finding_path", 1, 4);
+        				lcd.drawString("cur_pos : " + current_pos[0] + " " + current_pos[1], 1, 4);
         			}
         		    // System.out.println("current_pos: " + Arrays.toString(current_pos) + "\n");
         		    // first check this is visited block;
-    			    if (!visited[current_pos[0]][current_pos[1]]) {
+    			    if (!finished && !visited[current_pos[0]][current_pos[1]]) {
     			        if (is_red()) { // check_red_block
     			            red_found.add(current_pos);
     			        }
@@ -407,7 +398,7 @@ public class search_algorithm {
         			int[] d = drdc[way];
     			    int[] new_pos = {current_pos[0] + d[0], current_pos[1] + d[1]};
     			    
-    			    if (is_box()) {
+    			    if (!finished && is_box()) {
     			        if (!visited[new_pos[0]][new_pos[1]]) {
                             box_found.add(new_pos);
                             map[new_pos[0]][new_pos[1]] = 2;
@@ -448,7 +439,7 @@ public class search_algorithm {
     		if (finished) { // end moving
     		    break;
     		}
-		}
+		} while(keys.getButtons()!=Keys.ID_ESCAPE);
 		
 		// s ###################################
 		// print function should be different
@@ -462,8 +453,6 @@ public class search_algorithm {
 		// System.out.printf("current_pos: %s\n", Arrays.toString(current_pos));
 		// e ###################################
 
-		EV3 ev3 = (EV3) BrickFinder.getLocal();
-		TextLCD lcd = ev3.getTextLCD();
 		lcd.clear();
 
 		int line_count = 0;
@@ -473,5 +462,6 @@ public class search_algorithm {
 		for (int[] item: box_found) {
 			lcd.drawString("(" + item[0] + "," + item[1] + "," + "B)", 0, line_count++);
 		}
+		Delay.msDelay(10000);
     }
 }
