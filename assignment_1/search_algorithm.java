@@ -139,7 +139,7 @@ public class search_algorithm {
 
 	public static boolean select_start_point() {
 		lcd.clear();
-		lcd.drawString ("Select start point: {0,0} : <, {5,3} : >", 1, 4);
+		lcd.drawString ("{0,0} : <, {5,3} : >", 1, 4);
 
 		if (keys.waitForAnyPress() == Keys.ID_LEFT) {
 			return true;
@@ -158,7 +158,13 @@ public class search_algorithm {
 
 	public static void turn_robot(int curr_direction, int target_direction) {
 		int diff = target_direction - curr_direction;
-		if (diff < 0) {
+		if (diff == -3) {
+		    right_turn();
+		}
+		else if (diff == 3) {
+		    left_turn();
+		}
+		else if (diff < 0) {
 			for (int i = 0; i < Math.abs(diff); i++) {
 				left_turn();
 			}
@@ -311,12 +317,16 @@ public class search_algorithm {
 		boolean[][] visited = new boolean[6][4];
 		int[] original_pos;
 		int[][] map = new int[6][4];
+		int direction = 0; // 0 = up, 1 = right, 2 = down, 3 = left
 		
 		if (select_start_point()) {
 			original_pos = new int[] { 0, 0 };
+			direction = 0;
 		} else {
 			original_pos = new int[] { 5, 3 };
+			direction = 2;
 		}
+
 		int[] current_pos = original_pos;
 		
 	// s #########################################################
@@ -342,10 +352,9 @@ public class search_algorithm {
 		ArrayList<int[]> red_found = new ArrayList<int[]>();
 		ArrayList<int[]> box_found = new ArrayList<int[]>();
 		
-		int direction = 0; // 0 = up, 1 = right, 2 = down, 3 = left
-		
 		// search map (BFS)
 		boolean finished = false;
+		int found_num = 0;
 		
 		// moving until visit all cells
 		do {
@@ -359,7 +368,7 @@ public class search_algorithm {
 					break;
 				}
     		    
-    		    if (target_pos[0] == -1 && target_pos[1] == -1) { // cannot find un-visited cells
+    		    if (found_num == 4 || (target_pos[0] == -1 && target_pos[1] == -1)) { // cannot find un-visited cells
     		        finished = true;
     		        path = find_path(map, current_pos, original_pos);
         		} else if (visited[target_pos[0]][target_pos[1]]) {
@@ -376,13 +385,15 @@ public class search_algorithm {
         		for (int way: path) {
         			if(testing) {
         				lcd.clear();
-        				lcd.drawString("cur_pos : " + current_pos[0] + " " + current_pos[1], 1, 4);
+        				lcd.drawString("cur_pos: " + current_pos[0] + ", " + current_pos[1], 1, 4);
+						Delay.msDelay(1000);
         			}
         		    // System.out.println("current_pos: " + Arrays.toString(current_pos) + "\n");
         		    // first check this is visited block;
     			    if (!finished && !visited[current_pos[0]][current_pos[1]]) {
     			        if (is_red()) { // check_red_block
     			            red_found.add(current_pos);
+							found_num++;
     			        }
     			        visited[current_pos[0]][current_pos[1]] = true;
         			}
@@ -401,6 +412,7 @@ public class search_algorithm {
     			    if (!finished && is_box()) {
     			        if (!visited[new_pos[0]][new_pos[1]]) {
                             box_found.add(new_pos);
+							found_num++;
                             map[new_pos[0]][new_pos[1]] = 2;
                             visited[new_pos[0]][new_pos[1]] = true;
     			        }
@@ -439,7 +451,7 @@ public class search_algorithm {
     		if (finished) { // end moving
     		    break;
     		}
-		} while(keys.getButtons()!=Keys.ID_ESCAPE);
+		} while(keys.getButtons() != Keys.ID_ESCAPE);
 		
 		// s ###################################
 		// print function should be different
