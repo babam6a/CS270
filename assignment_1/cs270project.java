@@ -150,38 +150,67 @@ public class cs270project {
 
 		Delay.msDelay(3000);
 	}
-	
-	public static void motorRotateLeft() {
+
+	public static void motorSync() {
 		RegulatedMotor leftMotor = Motor. A;
 		RegulatedMotor rightMotor = Motor. B;
+		
+		leftMotor.synchronizeWith(new RegulatedMotor[] {rightMotor});
+		leftMotor.startSynchronization();
 		
 		leftMotor.setSpeed(400);
 		rightMotor.setSpeed(400);
 		leftMotor.setAcceleration(800);
 		rightMotor.setAcceleration(800);
-		leftMotor.rotate(-350);
-		rightMotor.rotate(350);
-		leftMotor.rotate(180);
+		
+		leftMotor.rotate(-627);
+		rightMotor.rotate(627);
+		
+		leftMotor.endSynchronization();
+
+		Delay.msDelay(3000);
+	}
+	
+	public static void motorRotateLeft() {
+		RegulatedMotor leftMotor = Motor. A;
+		RegulatedMotor rightMotor = Motor. B;
+		
+		leftMotor.synchronizeWith(new RegulatedMotor[] {rightMotor});
+		leftMotor.startSynchronization();
+		
+		leftMotor.setSpeed(400);
+		rightMotor.setSpeed(400);
+		leftMotor.setAcceleration(800);
+		rightMotor.setAcceleration(800);
+		
+		leftMotor.rotate(-257);
+		rightMotor.rotate(257);
+		
+		leftMotor.endSynchronization();
 	}
 
 	public static void motorRotateRight() {
 		RegulatedMotor leftMotor = Motor. A;
 		RegulatedMotor rightMotor = Motor. B;
 		
+		leftMotor.synchronizeWith(new RegulatedMotor[] {rightMotor});
+		leftMotor.startSynchronization();
+		
 		leftMotor.setSpeed(400);
 		rightMotor.setSpeed(400);
 		leftMotor.setAcceleration(800);
 		rightMotor.setAcceleration(800);
-		rightMotor.rotate(-350);
-		leftMotor.rotate(350);
-		rightMotor.rotate(175);
+		
+		leftMotor.rotate(257);
+		rightMotor.rotate(-257);
+		
+		leftMotor.endSynchronization();
 	}
 	
 	public static void main(String[] args) {
 		cs270project project = new cs270project();
-		motorMoveForward();
-		Delay.msDelay(5000);
-		project.IRSensor();
-		Delay.msDelay(10000);
+		motorRotateRight();
+		motorRotateLeft();
+		Delay.msDelay(1000);
 	}
 }
