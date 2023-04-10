@@ -290,7 +290,7 @@ public class search_algorithm {
 					}
 				}
 			}
-            if (radius >= 5) { // all cells are visited
+            if (radius >= 10) { // all cells are visited
                 nearest_pos = new int[]{-1, -1};
                 break;
             }
