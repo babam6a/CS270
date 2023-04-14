@@ -19,7 +19,7 @@ import lejos.robotics.SampleProvider;
 import lejos.utility.Delay;
 
 public class search_algorithm {
-	public static boolean testing = true; // a variable for testing robot-related function
+	public static boolean testing = false; // a variable for testing robot-related function
 	public static boolean noNeed = true;
 	
 	public static RegulatedMotor leftMotor = Motor. A;
@@ -49,13 +49,14 @@ public class search_algorithm {
 		leftMotor.startSynchronization();
 		leftMotor.setSpeed(400);
 		rightMotor.setSpeed(400);
-		leftMotor.setAcceleration(400);
-		rightMotor.setAcceleration(400);
-		leftMotor.rotate(657);
-		rightMotor.rotate(657);
+		leftMotor.setAcceleration(800);
+		rightMotor.setAcceleration(800);
+		leftMotor.rotate(690);
+		rightMotor.rotate(690);
 		leftMotor.endSynchronization();
+		
+		Delay.msDelay(2700);
 
-		Delay.msDelay(3000);
 		return;
 	}
 	public static void left_turn() {
@@ -63,35 +64,44 @@ public class search_algorithm {
 			lcd.clear();
 			lcd.drawString("left_turn", 1, 4);
 		}
+
+		leftMotor.synchronizeWith(new RegulatedMotor[] {rightMotor});
+		leftMotor.startSynchronization();
 		
 		leftMotor.setSpeed(400);
 		rightMotor.setSpeed(400);
-		leftMotor.setAcceleration(400);
-		rightMotor.setAcceleration(400);
-		leftMotor.rotate(-350);
-		rightMotor.rotate(350);
-		leftMotor.rotate(180);
+		leftMotor.setAcceleration(800);
+		rightMotor.setAcceleration(800);
+		
+		leftMotor.rotate(-220);
+		rightMotor.rotate(220);
+		
+		leftMotor.endSynchronization();
+		Delay.msDelay(1900);
         return;
     }
     public static void right_turn() {
 		if(testing) {
 			lcd.clear();
 			lcd.drawString("right_turn", 1, 4);
-		}
+		}		
+		leftMotor.synchronizeWith(new RegulatedMotor[] {rightMotor});
+		leftMotor.startSynchronization();
 		
 		leftMotor.setSpeed(400);
 		rightMotor.setSpeed(400);
-		leftMotor.setAcceleration(400);
-		rightMotor.setAcceleration(400);
-		rightMotor.rotate(-350);
-		leftMotor.rotate(350);
-		rightMotor.rotate(175);
+		leftMotor.setAcceleration(800);
+		rightMotor.setAcceleration(800);
+		
+		leftMotor.rotate(232);
+		rightMotor.rotate(-232);
+		
+		leftMotor.endSynchronization();
+		Delay.msDelay(1900);
         return;
     }
 
-	public static boolean is_box() {
-		Delay.msDelay(1000); // process loads after a second delay
-		
+	public static boolean is_box() {		
 		SampleProvider distanceMode = sensor.getDistanceMode();
 		float value[] = new float[distanceMode.sampleSize()];
 		
@@ -105,7 +115,7 @@ public class search_algorithm {
 			Delay.msDelay(1000); // a second to show the centimeter
 		}
 		
-		if(centimeter < 23) {
+		if(centimeter < 30) {
 			return true;
 		} else return false; // must be changed to account for sensor problem
 		
@@ -119,7 +129,7 @@ public class search_algorithm {
 	public static boolean is_red() {
 		int color_id = color_sensor.getColorID();
 		
-		if(testing || noNeed) {
+		if(testing && noNeed) {
 			lcd.clear();
 			lcd.drawString("Red? " + (color_id == Color.RED), 1, 4);
 			
@@ -326,7 +336,6 @@ public class search_algorithm {
 			original_pos = new int[] { 5, 3 };
 			direction = 2;
 		}
-
 		int[] current_pos = original_pos;
 		
 	// s #########################################################
@@ -466,7 +475,7 @@ public class search_algorithm {
 		// e ###################################
 
 		lcd.clear();
-
+		
 		int line_count = 0;
 		for (int[] item: red_found) {
 			lcd.drawString("(" + item[0] + "," + item[1] + "," + "R)", 0, line_count++);
@@ -474,6 +483,8 @@ public class search_algorithm {
 		for (int[] item: box_found) {
 			lcd.drawString("(" + item[0] + "," + item[1] + "," + "B)", 0, line_count++);
 		}
-		Delay.msDelay(10000);
+		do{
+			Delay.msDelay(1000);
+		} while(keys.getButtons() != Keys.ID_ESCAPE);
     }
 }
