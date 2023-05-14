@@ -42,7 +42,7 @@ if __name__ == "__main__" :
         while True:
             data = client.recv(size)
             if data == "Client ready" :
-                send_data = make(data)
+                send_data = make_data()
                 client.send(send_data)
             elif data == "Client finished" :
                 print("Finish program")
