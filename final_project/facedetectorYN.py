@@ -24,7 +24,6 @@ while True:
   # cv.imread('sth.jpg') can be helpful
   sleep(2)
   camera.capture(image, 'bgr')
-  camera.close()
   image = image.reshape((camH, camW, 3)) 
 
   # get results from the model.
