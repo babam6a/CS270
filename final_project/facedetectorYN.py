@@ -1,36 +1,42 @@
-# READ THIS
-# Made based on code in class
-# img is the image the facedetector wants to detect.
-# h,w is the height and width of the image
+# made this with lack of understanding and no decoding; make sure to change the code
 
-detector = cv.FaceDetectorYN.create("face_detection_yunet_2022mar.onnx", "", (h,w))
+from picamera import PiCamera
+from time import sleep
+import cv2 as cv
+import numpy as np
+
+# the width and height of the image. Change accordingly.
+camH = 2592
+camW = 1944
+
+image = np.empty((camH * camW * 3,), dtype=np.uint8)
+
+camera = PiCamera()
+camera.resolution = (camH, camW)
+
+# the model for testing. It detects the faces the picamera intakes.
+# face_detection_yunet_2022mar.onnx is necessary
+detector = cv.FaceDetectorYN.create("face_detection_yunet_2022mar.onnx", "", (camH, camW))
+detector.setInputSize((camH, camW))
 
 while True:
-    js_reply = video_frame(label_html, bbox)
-    if not js_reply:
-        break
+  # part of the code where it capturs with the camera.
+  # cv.imread('sth.jpg') can be helpful
+  sleep(2)
+  camera.capture(image, 'bgr')
+  camera.close()
+  image = image.reshape((camH, camW, 3)) 
 
-    # convert JS response to OpenCV Image
-    img = js_to_image(js_reply["img"])
+  # get results from the model.
+  detections = detector.detect(image)
 
-    # Read image
-    img_W = int(img.shape[1])
-    img_H = int(img.shape[0])
+  # x+w/2 + y+h/2 is the value we want
+  x = detections[1][0]
+  y = detections[1][1]
+  w = detections[1][2]
+  h = detections[1][3]
 
-    # Set input size
-    detector.setInputSize((img_W, img_H))
+  # if displaying following image, bounding box around the face will appear
+  image = cv.rectangle(image,(x,y),(x+w,y+h),(255,0,0),2)
 
-    # Getting detections
-    detections = detector.detect(img)
-
-    # create transparent overlay for bounding box
-    bbox_array = np.zeros([480,640,4], dtype=np.uint8)
-
-    # get face bounding box for overlay
-    _, faces = detections
-    if faces is not None:
-      for arr in faces:
-        x = arr[::2]
-        y = arr[1::2]
-        cv.rectangle(img,(np.uint32(x[0]),np.uint32(y[0])),
-                                (np.uint32(x[0])+np.uint32(x[1]),np.uint32(y[0])+np.uint32(y[1])),(255,0,0),2)
+camera.close()
