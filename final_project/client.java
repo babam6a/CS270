@@ -44,29 +44,40 @@ public class ev3Client {
 		} catch(UnknownHostException uhe) {
 			lcd.drawString("Host unknown: "+uhe.getMessage(), 1, 1);
 		}
-		
-		String sendM = "";
+
+		Thread.sleep(1000);
 		String recvM = "";
 		while(keys.getButtons() != Keys.ID_ESCAPE) {
 			try {
-				sendM = "Client ready";
-				streamOut.writeUTF(sendM);
+				streamOut.writeBytes("Client ready\n");
 				streamOut.flush();
 				
 				recvM = streamIn.readUTF();
-				if (recvM.equals("Impossible target")) { // impossible target, finish program
+				
+				String[] datas = recvM.split(" ");
+				boolean finish = false;
+				for (String elem : datas) {
+					if (elem.equals("Impossible") || elem.equals("Nothing")) { // impossible target, finish program
+						finish = true;
+					} else {
+						String[] data = elem.split("/");
+						lcd.clear();
+						System.out.println(data[0] + data[1] + data[2]);
+						move_robot(Float.parseFloat(data[0]), Float.parseFloat(data[1]), Float.parseFloat(data[2]));
+					}
+				}
+				
+				if (finish) {
 					lcd.drawString(recvM, 1, 4);
-					sendM = "Client finished";
-					streamOut.writeUTF(sendM);
+					streamOut.writeBytes("Client finished\n");
 					streamOut.flush();
 					break;
-				} else {
-					String[] data = recvM.split(" ");
-					move_robot(Float.parseFloat(data[0]), Float.parseFloat(data[1]), Float.parseFloat(data[2]));
 				}
 				Thread.sleep(1000);
 			} catch(IOException ioe) {
-				lcd.drawString("Sending error: "+ioe.getMessage(), 1, 4);
+				lcd.clear();
+				lcd.drawString("Error: "+ioe.getMessage(), 1, 4);
+				break;
 			}
 		}
 		
