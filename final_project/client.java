@@ -12,10 +12,23 @@ import lejos.hardware.BrickFinder;
 import lejos.hardware.ev3.EV3;
 import lejos.hardware.Keys;
 import lejos.hardware.lcd.TextLCD;
-
+import lejos.hardware.motor.Motor;
+import lejos.robotics.RegulatedMotor;
+import lejos.utility.Delay;
 
 public class ev3Client {
 	public static void move_robot(float z_angle, float x_angle, float velocity) {
+		RegulatedMotor Z_Motor = Motor.A;
+		RegulatedMotor X_Motor = Motor.B;
+		Z_Motor.rotate(int(z_angle));
+		Delay.msDelay(1000);
+		X_Motor.rotate(int(z_angle));
+		Delay.msDelay(1000);
+		
+		Z_Motor.ratae(int(-z_angle));
+		Delay.msDelay(1000);
+		X_Motor.rotate(int(-z_angle));
+		Delay.msDelay(1000);
 		return;
 	}
 	
