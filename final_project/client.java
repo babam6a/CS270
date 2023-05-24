@@ -13,6 +13,7 @@ import lejos.hardware.ev3.EV3;
 import lejos.hardware.Keys;
 import lejos.hardware.lcd.TextLCD;
 import lejos.hardware.motor.Motor;
+import lejos.hardware.port.SensorPort;
 import lejos.robotics.RegulatedMotor;
 import lejos.utility.Delay;
 
