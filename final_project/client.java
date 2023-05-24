@@ -19,20 +19,20 @@ import lejos.utility.Delay;
 
 public class ev3Client {
 	public static void move_robot(float z_angle, float x_angle, float velocity) {
-		RegulatedMotor Z1_Motor = Motor.A;
-		RegulatedMotor Z2_Motor = Motor.B;
+		RegulatedMotor ZleftMotor = Motor.A;
+		RegulatedMotor ZrightMotor = Motor.B;
 		RegulatedMotor X_Motor = Motor.C;
 // 		RegulatedMotor S_Motor = Motor.S1;
 // 		RegulatedMotor L_Motor = Motor.S2;
 		int z = (int) z_angle;
 		int x = (int) x_angle;
 		
-		Z1_Motor.synchronizeWith(new RegulatedMotor[] {Z2_Motor});
-		Z1.Motor.startSynchronization();
-		Z1_Motor.setSpeed(200);
-		Z2_Motor.setSpeed(200);
-        	Z1_Motor.rotate(z);
-		Z2_Motor.rotate(-z);
+		ZleftMotor.synchronizeWith(new RegulatedMotor[] {ZrightMotor});
+		ZleftMotor.startSynchronization();
+		ZrightMotor.setSpeed(200);
+		ZleftMotor.setSpeed(200);
+        	ZleftMotor.rotate(z);
+		ZrightMotor.rotate(-z);
 		Delay.msDelay(1000);
 		
 		X_Motor.setSpeed(200);
@@ -44,12 +44,12 @@ public class ev3Client {
 // 		L_Motor.setSpeed(200);
 // 		L_Motor.rotate(800);
 		
-		Z1_Motor.rotate(-z);
-		Z2_Motor.rotate(z);
+		ZleftMotor.rotate(-z);
+		ZrightMotor.rotate(z);
 		Delay.msDelay(1000);
 		X_Motor.rotate(-x);
 		Delay.msDelay(1000);
-		Z1_Motor.endSynchronization();
+		ZleftMotor.endSynchronization();
 		return;
 	}
 	
