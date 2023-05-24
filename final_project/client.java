@@ -27,7 +27,7 @@ public class ev3Client {
 		int z = (int) z_angle;
 		int x = (int) x_angle;
 		
-		Z1_Motor.synchronizeWith(RegulatedMotor[] {Z2_Motor});
+		Z1_Motor.synchronizeWith(new RegulatedMotor[] {Z2_Motor});
 		Z1.Motor.startSynchronization();
 		Z1_Motor.setSpeed(200);
 		Z2_Motor.setSpeed(200);
