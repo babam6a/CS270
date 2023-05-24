@@ -31,7 +31,7 @@ public class ev3Client {
 		Z1_Motor.setSpeed(200);
 		Z2_Motor.setSpeed(200);
         	Z1_Motor.rotate(z);
-		Z2_Motor.rotate(z);
+		Z2_Motor.rotate(-z);
 		Delay.msDelay(1000);
 		
 		X_Motor.setSpeed(200);
@@ -44,7 +44,7 @@ public class ev3Client {
 // 		L_Motor.rotate(800);
 		
 		Z1_Motor.rotate(-z);
-		Z2_Motor.rotate(-z);
+		Z2_Motor.rotate(z);
 		Delay.msDelay(1000);
 		X_Motor.rotate(-x);
 		Delay.msDelay(1000);
