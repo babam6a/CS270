@@ -20,14 +20,16 @@ public class ev3Client {
 	public static void move_robot(float z_angle, float x_angle, float velocity) {
 		RegulatedMotor Z_Motor = Motor.A;
 		RegulatedMotor X_Motor = Motor.B;
-		Z_Motor.rotate(int(z_angle));
+		int z = (int) z_angle;
+		int x = (int) x_angle;
+		Z_Motor.rotate(z);
 		Delay.msDelay(1000);
-		X_Motor.rotate(int(z_angle));
+		X_Motor.rotate(x);
 		Delay.msDelay(1000);
 		
-		Z_Motor.ratae(int(-z_angle));
+		Z_Motor.ratae(-z);
 		Delay.msDelay(1000);
-		X_Motor.rotate(int(-z_angle));
+		X_Motor.rotate(-x);
 		Delay.msDelay(1000);
 		return;
 	}
