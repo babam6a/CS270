@@ -18,13 +18,10 @@ import lejos.robotics.RegulatedMotor;
 import lejos.utility.Delay;
 
 public class ev3Client {
-	public static void move_robot(float z_angle, float x_angle, float velocity) {
+	public static void z_rotate_robot(float z_angle) {
 		RegulatedMotor Z1_Motor = Motor.A;
 		RegulatedMotor Z2_Motor = Motor.B;
-		RegulatedMotor X_Motor = Motor.C;
-// 		RegulatedMotor S_Motor = Motor.D;
 		int z = (int) z_angle;
-		int x = (int) x_angle;
 		
 		Z1_Motor.synchronizeWith(new RegulatedMotor[] {Z2_Motor});
 		Z1_Motor.startSynchronization();
@@ -33,6 +30,12 @@ public class ev3Client {
         	Z1_Motor.rotate(z);
 		Z2_Motor.rotate(-z);
 		Delay.msDelay(1000);
+	}
+	
+	public static void shoot_robot(float z_angle, float x_angle, float velocity) {	
+		RegulatedMotor X_Motor = Motor.C;
+// 		RegulatedMotor S_Motor = Motor.D;
+		int x = (int) x_angle;
 		
 		X_Motor.setSpeed(200);
 		X_Motor.rotate(x);
@@ -96,7 +99,19 @@ public class ev3Client {
 						String[] data = elem.split("/");
 						lcd.clear();
 						System.out.println(data[0] + data[1] + data[2]);
-						move_robot(Float.parseFloat(data[0]), Float.parseFloat(data[1]), Float.parseFloat(data[2]));
+						z_rotate_robot(Float.parseFloat(data[0]));
+						
+						while (true) { // adjust position by taking picture
+							streamOut.writeBytes("Position check");
+							streamOut.flush();
+							recvM = streamIn.readUTF();
+							if recvM.equals("Yes") {
+								break;
+							} else {
+								z_rotate_robot(Float.parseFloat(recvM));
+							}
+						}
+						shoot_robot(Float.parseFloat(data[0]), Float.parseFloat(data[1]), Float.parseFloat(data[2]));
 					}
 				}
 				
