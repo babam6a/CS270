@@ -60,7 +60,7 @@ if __name__ == "__main__" :
             data = origin_data.decode().rstrip("\n")
             print("data: %s"%data)
 
-            if "Client ready" in data:
+            if ("Client ready" in data) or ("Position check" in data):
                 data = make_data()
                 data = bytearray(data, "utf8")
                 size = len(data)
