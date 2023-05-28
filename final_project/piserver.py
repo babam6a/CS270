@@ -60,12 +60,35 @@ if __name__ == "__main__" :
             data = origin_data.decode().rstrip("\n")
             print("data: %s"%data)
 
-            if ("Client ready" in data) or ("Position check" in data):
+            if "Client ready" in data :
                 data = make_data()
                 data = bytearray(data, "utf8")
                 size = len(data)
                 client.sendall(struct.pack("!H", size))
                 client.sendall(data)
+                
+            elif "Position check" in data :
+                delta = 0.5
+                delta2 = 10
+                data = make_data().split(" ")
+                send = ""
+                for elem in data :
+                    if abs(float(elem.split("/")[0])) > delta2 :
+                        continue
+                        
+                    if abs(float(elem.split("/")[0])) < delta :
+                        send = "Yes"
+                    else :
+                        send = elem.split("/")[0]
+                    break
+                if send == "" :
+                    print("Error")
+                else :
+                    send = bytearray(send, "utf8")
+                    size = len(send)
+                    client.sendall(struct.pack("!H", size))
+                    client.sendall(send)
+                    
             elif "Client finished" in data :
                 print("Finish program")
                 client.close()
