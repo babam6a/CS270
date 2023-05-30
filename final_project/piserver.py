@@ -3,15 +3,16 @@ from trajectory import cal_z_angle, cal_trajectory
 import socket
 import struct
 
+d = 30 # distance from target
+h_init = 0 # height of model
+g = 9.8 # gravity
+max_v = 30 # maximum strength of archery
+
 def model(picture) :
     ret = []
     return ret
 
 def make_data() :
-    d = 30 # distance from target
-    h_init = 0 # height of model
-    g = 9.8 # gravity
-    max_v = 30 # maximum strength of archery
     file_name ='capture.jpg' # file_name of capture image
     
     picture = take_picture(file_name)
@@ -33,6 +34,34 @@ def make_data() :
                 ans_str += "%.3f/%.3f/%.3f "%(z_angle, x_angle, v)
     
     return ans_str.rstrip(" ")
+
+def position_check() :
+    file_name = "position_check.jpg" # file_name of capture image
+    delta = 0.5
+
+    picture = take_picture(file_name)
+    cord_list = model(picture) # CNN model
+
+    ans_str = ""
+
+    if len(cord_list) == 0 : # turn too much
+        ans_str = "Turn too much"
+
+    else :
+        # todo: need to fix for multiple targets
+        # for (x, _) in cord_list :
+
+        try :
+            (x, _) = cord_list[0]
+            if x < delta :
+                ans_str = "Yes"
+            else :
+                ans_str = "%.3f"%cal_z_angle(d,x)
+
+        except : # error occured while calculating
+            ans_str = "Error"
+
+    return ans_str
 
 if __name__ == "__main__" :
     server_address = "10.0.1.3"
@@ -68,26 +97,11 @@ if __name__ == "__main__" :
                 client.sendall(data)
                 
             elif "Position check" in data :
-                delta = 0.5
-                delta2 = 10
-                data = make_data().split(" ")
-                send = ""
-                for elem in data :
-                    if abs(float(elem.split("/")[0])) > delta2 :
-                        continue
-                        
-                    if abs(float(elem.split("/")[0])) < delta :
-                        send = "Yes"
-                    else :
-                        send = elem.split("/")[0]
-                    break
-                if send == "" :
-                    print("Error")
-                else :
-                    send = bytearray(send, "utf8")
-                    size = len(send)
-                    client.sendall(struct.pack("!H", size))
-                    client.sendall(send)
+                send = position_check()
+                send = bytearray(send, "utf8")
+                size = len(send)
+                client.sendall(struct.pack("!H", size))
+                client.sendall(send)
                     
             elif "Client finished" in data :
                 print("Finish program")

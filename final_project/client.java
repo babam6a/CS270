@@ -95,23 +95,48 @@ public class ev3Client {
 				for (String elem : datas) {
 					if (elem.equals("Impossible") || elem.equals("Nothing")) { // impossible target, finish program
 						finish = true;
-					} else {
+					} 
+					else {
 						String[] data = elem.split("/");
+						Float z_angle = Float.parseFloat(data[0]);
+						Float x_angle = Float.parseFloat(data[1]);
+						Float velocity = Float.parseFloat(data[2]);
+						
 						lcd.clear();
 						System.out.println(data[0] + data[1] + data[2]);
-						z_rotate_robot(Float.parseFloat(data[0]));
+						z_rotate_robot(z_angle);
 						
-						while (true) { // adjust position by taking picture
-							streamOut.writeBytes("Position check");
+						while (true) { // adjust position by checking the position
+							streamOut.writeBytes("Position check\n");
 							streamOut.flush();
 							recvM = streamIn.readUTF();
-							if recvM.equals("Yes") {
+
+							if recvM.equals("Yes") { // position fixed and ready to shoot
 								break;
-							} else {
-								z_rotate_robot(Float.parseFloat(recvM));
+							} 
+							else if recvM.equals("Error") { // turn too much or error occured
+								lcd.clear();
+								lcd.drawString("Error", 1, 4);
+								finish = true;
+								break;
+							} 
+							else if recvM.equals("Turn too much") { // turn too much or error occured
+								z_rotate_robot(-(z_angle / 2)); // re-rotate half of the angle
+								z_angle = z_angle / 2;
+							} 
+							else { // adjust position
+								Float adjust_angle = Float.parseFloat(recvM);
+								z_angle = z_angle + adjust_angle;
+
+								z_rotate_robot(adjust_angle);
 							}
+							Thread.sleep(1000);
 						}
-						shoot_robot(Float.parseFloat(data[0]), Float.parseFloat(data[1]), Float.parseFloat(data[2]));
+
+						if (finish) {
+							break; // error occured during adjust position, finish program
+						}
+						shoot_robot(z_angle, x_angle, velocity);
 					}
 				}
 				
@@ -121,6 +146,7 @@ public class ev3Client {
 					streamOut.flush();
 					break;
 				}
+
 				Thread.sleep(1000);
 			} catch(IOException ioe) {
 				lcd.clear();
