@@ -21,7 +21,7 @@ public class ev3Client {
 				
 	public static void z_rotate_robot(float z_angle) {
 		RegulatedMotor Z_Motor = Motor.A;
-		int z = (int) z_angle/14;
+		int z = (int) z_angle*0.111688;
 
 		Z1_Motor.setSpeed(100);
         	Z1_Motor.rotate(z);
