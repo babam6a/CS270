@@ -37,7 +37,7 @@ public class ev3Client {
 		RegulatedMotor X_Motor = Motor.C;
 		int x = (int) x_angle*3.22+1.5 ;
 
-		X_Motor.setSpeed(50);
+		X_Motor.setSpeed(20);
         	X_Motor.rotate(x);
 		Delay.msDelay(1000);
 	}
