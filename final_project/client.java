@@ -21,10 +21,10 @@ public class ev3Client {
 				
 	public static void z_rotate_robot(float z_angle) {
 		RegulatedMotor Z_Motor = Motor.A;
-		int z = (int) z_angle*0.111688;
+		int z = (int) z_angle*8.953;
 
-		Z1_Motor.setSpeed(100);
-        	Z1_Motor.rotate(z);
+		Z_Motor.setSpeed(100);
+        	Z_Motor.rotate(z);
 		Delay.msDelay(1000);
 	}
 
