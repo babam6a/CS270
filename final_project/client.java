@@ -20,21 +20,16 @@ import lejos.utility.Delay;
 public class ev3Client {
 				
 	public static void z_rotate_robot(float z_angle) {
-		RegulatedMotor Z1_Motor = Motor.A;
-		RegulatedMotor Z2_Motor = Motor.B;
+		RegulatedMotor Z_Motor = Motor.A;
 		int z = (int) z_angle/14;
 
-		Z1_Motor.synchronizeWith(new RegulatedMotor[] {Z2_Motor});
-		Z1_Motor.startSynchronization();
 		Z1_Motor.setSpeed(100);
-		Z2_Motor.setSpeed(100);
         	Z1_Motor.rotate(z);
-		Z2_Motor.rotate(-z);
 		Delay.msDelay(1000);
 	}
 
 	public static void x_rotate_robot(float x_angle){
-		RegulatedMotor X_Motor = Motor.C;
+		RegulatedMotor X_Motor = Motor.B;
 		int x = (int) x_angle*3.22+1.5 ;
 
 		X_Motor.setSpeed(20);
@@ -44,10 +39,10 @@ public class ev3Client {
 		
 	
 	public static void shoot_robot(float z_angle, float x_angle, float velocity) {	
-		RegulatedMotor Z1_Motor = Motor.A;
-		RegulatedMotor Z2_Motor = Motor.B;
-		RegulatedMotor X_Motor = Motor.C;
-// 		RegulatedMotor S_Motor = Motor.D;
+		RegulatedMotor Z_Motor = Motor.A;
+		RegulatedMotor X_Motor = Motor.B;
+//		RegulatedMotor S_Motor = Motor.C;
+// 		RegulatedMotor L_Motor = Motor.D;
 		
 // 		S_Motor.setSpeed(200);
 // 		S_Motor.rotate(800);
@@ -55,16 +50,12 @@ public class ev3Client {
 // 		L_Motor.rotate(800);
 		int z = (int) z_angle/14 ;
 		int x = (int) x_angle*3.22 + 1.5 ;
-		
-		Z1_Motor.synchronizeWith(new RegulatedMotor[] {Z2_Motor});
-		Z1_Motor.startSynchronization();
-		Z1_Motor.setSpeed(100);
-		Z2_Motor.setSpeed(100);
-        	Z1_Motor.rotate(z);
-		Z2_Motor.rotate(-z);
-		Delay.msDelay(1000);
-		Z1_Motor.endSynchronization();
 
+		Z_Motor.setSpeed(100);
+        	Z_Motor.rotate(-z);
+		Delay.msDelay(1000);
+
+		X_Motor.setSpeed(20);
 		X_Motor.rotate(-x);
 		Delay.msDelay(1000);
 
