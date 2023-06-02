@@ -29,12 +29,9 @@ def model(picture, w, h) :
     # overall, picking the right confidence is essential for prediction
     result = model.predict(picture, confidence=30, overlap=30).json()
 
-    ret = []
-    for i in range(len(result['predictions'])):
-        # make cordinate from center of the picture
-        ret.append( (int(result['predictions'][i]['x']) - (w//2), int(result['predictions'][i]['y']) - (h//2)) )
-        if debug :
-            print("x: %d, y: %d"%(ret[-1][0], ret[-1][1]))
+    ret= [(int(result['predictions'][0]['x']) - (w//2), int(result['predictions'][0]['y']) - (h//2)) )]
+    if debug :
+        print("x: %d, y: %d"%(ret[-1][0], ret[-1][1]))
 
     return ret
 
