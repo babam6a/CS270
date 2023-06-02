@@ -20,37 +20,37 @@ import lejos.utility.Delay;
 public class ev3Client {
 				
 	public static void z_rotate_robot(float z_angle) {
-		RegulatedMotor Z_Motor = Motor.A;
-		int z = (int) z_angle*8.953;
+		RegulatedMotor Z_Motor = Motor.B;
+		int z = (int) (z_angle*8.953*2.8);
 
 		Z_Motor.setSpeed(100);
-        Z_Motor.rotate(z);
+        	Z_Motor.rotate(-z);
 		Delay.msDelay(1000);
 	}
 
 	public static void x_rotate_robot(float x_angle){
-		RegulatedMotor X_Motor = Motor.B;
-		int x = (int) x_angle*3.22+1.5 ;
+		RegulatedMotor X_Motor = Motor.C;
+		int x = (int) (x_angle*2.2);
+		if (x_angle < 0) x = x ;
+		else x = x;
 
-		X_Motor.setSpeed(20);
-        X_Motor.rotate(x);
+		X_Motor.setSpeed(30);
+       		X_Motor.rotate(x);
 		Delay.msDelay(1000);
 	}
 		
 	public static void shoot_robot(float z_angle, float x_angle, float velocity) {	
-		RegulatedMotor Z_Motor = Motor.B;
-		RegulatedMotor X_Motor = Motor.C;
 		RegulatedMotor S_Motor = Motor.D;
 		RegulatedMotor L_Motor = Motor.A;
 		
-		// int z = (int) z_angle/14 ;
+//		int z = (int) (z_angle*8.953);
 		// int x = (int) x_angle*3.22 + 1.5 ;
-		int drag = 1140;
+		int drag = 1700;
 
-		x_rotate_robot(x_angle);
+		x_rotate_robot(-x_angle);
 
 		// pull the bow
-		S_Motor.setSpeed(500);
+		S_Motor.setSpeed(800);
 		S_Motor.rotate(drag);
 
 		// fix location
@@ -58,7 +58,7 @@ public class ev3Client {
 		L_Motor.rotate(50);
 
 		// release the bow
-		S_Motor.setSpeed(500);
+		S_Motor.setSpeed(800);
 		S_Motor.rotate(-drag);
 
 		// shoot!
@@ -66,8 +66,7 @@ public class ev3Client {
 		L_Motor.rotate(-50);
 
 		// return to original position
-		z_rotate_robot(-z_angle);
-		x_rotate_robot(-x_angle);
+		x_rotate_robot(x_angle);
 	}
 	
 	public static void main(String args[]) throws IOException, InterruptedException, NotBoundException{
@@ -145,13 +144,14 @@ public class ev3Client {
 
 								z_rotate_robot(adjust_angle);
 							}
-							Thread.sleep(1000);
+							Thread.sleep(500);
 						}
 
 						if (finish) {
 							break; // error occured during adjust position, finish program
 						}
 						shoot_robot(z_angle, x_angle, velocity);
+						z_rotate_robot(-z_angle);
 					}
 				}
 				
@@ -162,7 +162,7 @@ public class ev3Client {
 					break;
 				}
 
-				Thread.sleep(1000);
+				Thread.sleep(500);
 			} catch(IOException ioe) {
 				lcd.clear();
 				lcd.drawString("Error: "+ioe.getMessage(), 1, 4);
