@@ -14,7 +14,6 @@ def cal_trajectory(d, z_angle, h_init, g, y, max_v) :
         except :
             continue
         if v < max_v :
-            print("a: %.3f, v: %.3f"%(a / 10, v))
             return (a / 10, v)
     return (0, 0)
 

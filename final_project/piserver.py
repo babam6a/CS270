@@ -21,8 +21,9 @@ d = 30 # distance from target
 h_init = 0 # height of model
 g = 9.8 # gravity
 max_v = 30 # maximum strength of archery
+debug = True
 
-def model(picture) :
+def model(picture, w, h) :
     # when confidence is low, more predictions appear making it likely to predict false results
     # when confidence is high, less predictions appear making it likely to pick out true results
     # overall, picking the right confidence is essential for prediction
@@ -30,15 +31,19 @@ def model(picture) :
 
     ret = []
     for i in range(len(result['predictions'])):
-        ret.append( (int(result['predictions'][i]['x'], int(result['predictions'][i]['y'])) )
+        # make cordinate from center of the picture
+        ret.append( (int(result['predictions'][i]['x']) - (w//2), int(result['predictions'][i]['y']) - (h//2)) )
+        if debug :
+            print("x: %d, y: %d"%(ret[-1][0], ret[-1][1]))
 
     return ret
 
 def make_data() :
     file_name ='capture.jpg' # file_name of capture image
+    pic_size = (1280, 720) # size of capture image
 
-    picture = take_picture(file_name)
-    cord_list = model(picture) # CNN model
+    picture = take_picture(file_name, pic_size)
+    cord_list = model(picture, pic_size[0], pic_size[1]) # CNN model
 
     ans_str = ""
 
@@ -49,6 +54,8 @@ def make_data() :
         for (x, y) in cord_list :
             z_angle = cal_z_angle(d,x)
             (x_angle, v) = cal_trajectory(d, z_angle, h_init, g, y, max_v)
+            if debug :
+                print("z: %.3f, x: %.3f, v: %.3f"%(z_angle, x_angle, v))
 
             if (x_angle, v) == (0,0) :
                 ans_str +=  "Impossible " # cannot shoot

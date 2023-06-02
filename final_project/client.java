@@ -24,7 +24,7 @@ public class ev3Client {
 		int z = (int) z_angle*8.953;
 
 		Z_Motor.setSpeed(100);
-        	Z_Motor.rotate(z);
+        Z_Motor.rotate(z);
 		Delay.msDelay(1000);
 	}
 
@@ -33,33 +33,41 @@ public class ev3Client {
 		int x = (int) x_angle*3.22+1.5 ;
 
 		X_Motor.setSpeed(20);
-        	X_Motor.rotate(x);
+        X_Motor.rotate(x);
 		Delay.msDelay(1000);
 	}
 		
-	
 	public static void shoot_robot(float z_angle, float x_angle, float velocity) {	
-		RegulatedMotor Z_Motor = Motor.A;
-		RegulatedMotor X_Motor = Motor.B;
-//		RegulatedMotor S_Motor = Motor.C;
-// 		RegulatedMotor L_Motor = Motor.D;
+		RegulatedMotor Z_Motor = Motor.B;
+		RegulatedMotor X_Motor = Motor.C;
+		RegulatedMotor S_Motor = Motor.D;
+		RegulatedMotor L_Motor = Motor.A;
 		
-// 		S_Motor.setSpeed(200);
-// 		S_Motor.rotate(800);
-// 		L_Motor.setSpeed(200);
-// 		L_Motor.rotate(800);
-		int z = (int) z_angle/14 ;
-		int x = (int) x_angle*3.22 + 1.5 ;
+		// int z = (int) z_angle/14 ;
+		// int x = (int) x_angle*3.22 + 1.5 ;
+		int drag = 1140;
 
-		Z_Motor.setSpeed(100);
-        	Z_Motor.rotate(-z);
-		Delay.msDelay(1000);
+		x_rotate_robot(x_angle);
 
-		X_Motor.setSpeed(20);
-		X_Motor.rotate(-x);
-		Delay.msDelay(1000);
+		// pull the bow
+		S_Motor.setSpeed(500);
+		S_Motor.rotate(drag);
 
-		return;
+		// fix location
+		L_Motor.setSpeed(200);
+		L_Motor.rotate(50);
+
+		// release the bow
+		S_Motor.setSpeed(500);
+		S_Motor.rotate(-drag);
+
+		// shoot!
+		L_Motor.setSpeed(200);
+		L_Motor.rotate(-50);
+
+		// return to original position
+		z_rotate_robot(-z_angle);
+		x_rotate_robot(-x_angle);
 	}
 	
 	public static void main(String args[]) throws IOException, InterruptedException, NotBoundException{
@@ -118,16 +126,16 @@ public class ev3Client {
 							streamOut.flush();
 							recvM = streamIn.readUTF();
 
-							if recvM.equals("Yes") { // position fixed and ready to shoot
+							if (recvM.equals("Yes")) { // position fixed and ready to shoot
 								break;
 							} 
-							else if recvM.equals("Error") { // turn too much or error occured
+							else if (recvM.equals("Error")) { // error occured
 								lcd.clear();
 								lcd.drawString("Error", 1, 4);
 								finish = true;
 								break;
 							} 
-							else if recvM.equals("Turn too much") { // turn too much or error occured
+							else if (recvM.equals("Turn too much")) { // turn too much
 								z_rotate_robot(-(z_angle / 2)); // re-rotate half of the angle
 								z_angle = z_angle / 2;
 							} 
