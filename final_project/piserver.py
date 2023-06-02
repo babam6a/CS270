@@ -52,7 +52,7 @@ def make_data() :
 
     else :
         for (x, y) in cord_list :
-            z_angle = cal_z_angle(d,x)
+            z_angle = cal_z_angle(d, x, pic_size[0])
             (x_angle, v) = cal_trajectory(d, z_angle, h_init, g, y, max_v)
             if debug :
                 print("z: %.3f, x: %.3f, v: %.3f"%(z_angle, x_angle, v))
