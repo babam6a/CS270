@@ -15,63 +15,84 @@ version = [1,2,3][2] # both project has total of 3 versions
 rf = Roboflow(api_key=apiKey)
 projectName = "cs270-team-8"+ ("-mkjrf" if ("VPr4wYYv2Q7tB49pzRqA" == apiKey) else "")
 project = rf.workspace().project(projectName)
-model = project.version(version).model
+model_s = project.version(version).model
 
-d = 30 # distance from target
-h_init = 0 # height of model
+d = 0.9 # distance from target
+h_init = 0.18 # height of model
 g = 9.8 # gravity
-max_v = 30 # maximum strength of archery
-debug = True
+max_v = 5 # maximum strength of archery
+pic_size = (1280,720)
+debug = False
 
 def model(picture, w, h) :
+    #print("begin model")
     # when confidence is low, more predictions appear making it likely to predict false results
     # when confidence is high, less predictions appear making it likely to pick out true results
     # overall, picking the right confidence is essential for prediction
-    result = model.predict(picture, confidence=30, overlap=30).json()
+    result = model_s.predict(picture, confidence=30, overlap=30).json()
+    #print(result)
 
-    ret= [(int(result['predictions'][0]['x']) - (w//2), int(result['predictions'][0]['y']) - (h//2)) )]
+    ret = []
     if debug :
-        print("x: %d, y: %d"%(ret[-1][0], ret[-1][1]))
+        return [(1,1)]
+    # make cordinate from center of the picture
+    if len(result['predictions']) == 0 :
+        return ret
+
+    ret.append( (int(result['predictions'][0]['x']) - (w//2), -int(result['predictions'][0]['y'] - (h//2)) ))
+    #print("x: %d, y: %d"%(ret[0][0], ret[0][1]))
 
     return ret
 
 def make_data() :
     file_name ='capture.jpg' # file_name of capture image
-    pic_size = (1280, 720) # size of capture image
 
     picture = take_picture(file_name, pic_size)
+    #print("picture")
     cord_list = model(picture, pic_size[0], pic_size[1]) # CNN model
+    #print("model")
 
     ans_str = ""
 
     if len(cord_list) == 0 :
+        #print("Nothing")
         ans_str = "Nothing"
 
     else :
         for (x, y) in cord_list :
-            z_angle = cal_z_angle(d, x, pic_size[0])
-            (x_angle, v) = cal_trajectory(d, z_angle, h_init, g, y, max_v)
             if debug :
-                print("z: %.3f, x: %.3f, v: %.3f"%(z_angle, x_angle, v))
+                i = input("test(z,x,v): ").split(" ")
+                (z_angle, x_angle, v) = (float(i[0]), float(i[1]), float(i[2]))
+                #print("z: %.3f, x: %.3f, v: %.3f"%(z_angle, x_angle, v))
+            else :
+                z_angle = cal_z_angle(d, x, pic_size[0])
+                #print("z_angle")
+                (x_angle, v) = cal_trajectory(d, z_angle, h_init, g, y, pic_size[1], max_v)
+                #print("x_angle")
 
             if (x_angle, v) == (0,0) :
+                #print("Impossible")
                 ans_str +=  "Impossible " # cannot shoot
             else :
                 ans_str += "%.3f/%.3f/%.3f "%(z_angle, x_angle, v)
+                #print(ans_str)
 
     return ans_str.rstrip(" ")
 
 def position_check() :
     file_name = "position_check.jpg" # file_name of capture image
-    delta = 0.5
+    delta = 0.2
 
-    picture = take_picture(file_name)
-    cord_list = model(picture) # CNN model
+    picture = take_picture(file_name, pic_size)
+    cord_list = model(picture, pic_size[0], pic_size[1]) # CNN model
+    #print("cord_list:")
+    #print(cord_list)
 
     ans_str = ""
 
-    if len(cord_list) == 0 : # turn too much
-        ans_str = "Turn too much"
+    if len(cord_list) == 0 :
+        ans_str = "Yes"
+        #print(ans_str)
 
     else :
         # todo: need to fix for multiple targets
@@ -79,13 +100,20 @@ def position_check() :
 
         try :
             (x, _) = cord_list[0]
-            if x < delta :
+            z_angle = cal_z_angle(d,x,pic_size[0])
+            if abs(z_angle) < delta :
+                #print(z_angle)
                 ans_str = "Yes"
             else :
-                ans_str = "%.3f"%cal_z_angle(d,x)
+                if debug :
+                    ans_str = "Yes"
+                else :
+                    ans_str = "%.3f"%z_angle
 
         except : # error occured while calculating
             ans_str = "Error"
+            #print(ans_str)
+    #print(ans_str)
 
     return ans_str
 
@@ -113,7 +141,7 @@ if __name__ == "__main__" :
                     break
 
             data = origin_data.decode().rstrip("\n")
-            print("data: %s"%data)
+            #print("data: %s"%data)
 
             if "Client ready" in data :
                 data = make_data()
