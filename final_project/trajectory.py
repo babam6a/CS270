@@ -9,7 +9,7 @@ def cal_z_angle(d, x, w) :
 def cal_trajectory(d, z_angle, h_init, g, y, h, max_v) :
     fovy = 48.8
     x = d / math.cos(math.radians(z_angle))
-    cal_h = d * math.tan(natg.radians(fovy / h) * y))
+    cal_h = d * math.tan(math.radians(fovy / h) * y))
     
     for a in range(1, 900) : # 0.1 ~ 89.9
         rad_a = math.radians(a / 10)
