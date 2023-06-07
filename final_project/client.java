@@ -31,8 +31,6 @@ public class ev3Client {
 	public static void x_rotate_robot(float x_angle){
 		RegulatedMotor X_Motor = Motor.C;
 		int x = (int) (x_angle*2.2);
-		if (x_angle < 0) x = x ;
-		else x = x;
 
 		X_Motor.setSpeed(30);
        		X_Motor.rotate(x);
@@ -43,8 +41,6 @@ public class ev3Client {
 		RegulatedMotor S_Motor = Motor.D;
 		RegulatedMotor L_Motor = Motor.A;
 		
-//		int z = (int) (z_angle*8.953);
-		// int x = (int) x_angle*3.22 + 1.5 ;
 		int drag = 1700;
 
 		x_rotate_robot(-x_angle);
